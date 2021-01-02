@@ -44,17 +44,29 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             return (await _collection.FindAsync(filterExpression)).FirstOrDefault();
         }
 
-        public async Task<TDocument> FindById(string id)
+        public async Task<TDocument> FindById(string id, bool showDeleted)
         {
             var objectId = new ObjectId(id);
-            var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId);
+
+            FilterDefinition<TDocument> filter;
+            if (showDeleted)
+                filter = Builders<TDocument>.Filter.And(
+                    Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId),
+                    Builders<TDocument>.Filter.Or(
+                        Builders<TDocument>.Filter.Eq(doc => doc.IsDeleted, false),
+                        Builders<TDocument>.Filter.Eq(doc => doc.IsDeleted, true)));
+            else
+                filter = Builders<TDocument>.Filter.And(
+                    Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId),
+                    Builders<TDocument>.Filter.Eq(doc => doc.IsDeleted, false));
+
             return (await _collection.FindAsync(filter)).SingleOrDefault();
         }
 
         public async Task<TDocument> InsertOne(TDocument document)
         {
             if (document == null) throw new ArgumentNullException(typeof(TDocument).Name + " object is null");
-            
+
             await _collection.InsertOneAsync(document);
             return document;
         }
