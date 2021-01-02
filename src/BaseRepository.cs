@@ -11,7 +11,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
     public abstract class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocument : IDocument
     {
         private readonly IMongoCollection<TDocument> _collection;
-        protected readonly IDbContext<TDocument> Context;
+        protected IDbContext<TDocument> Context { get; }
 
         protected BaseRepository(IDbContext<TDocument> context)
         {
@@ -44,18 +44,31 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             return (await _collection.FindAsync(filterExpression)).FirstOrDefault();
         }
 
-        public async Task<TDocument> FindById(string id)
+        public async Task<TDocument> FindById(string id, bool showDeleted)
         {
             var objectId = new ObjectId(id);
-            var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId);
+
+            FilterDefinition<TDocument> filter;
+            if (showDeleted)
+                filter = Builders<TDocument>.Filter.And(
+                    Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId),
+                    Builders<TDocument>.Filter.Or(
+                        Builders<TDocument>.Filter.Eq(doc => doc.IsDeleted, false),
+                        Builders<TDocument>.Filter.Eq(doc => doc.IsDeleted, true)));
+            else
+                filter = Builders<TDocument>.Filter.And(
+                    Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId),
+                    Builders<TDocument>.Filter.Eq(doc => doc.IsDeleted, false));
+
             return (await _collection.FindAsync(filter)).SingleOrDefault();
         }
 
-        public async Task InsertOne(TDocument document)
+        public async Task<TDocument> InsertOne(TDocument document)
         {
             if (document == null) throw new ArgumentNullException(typeof(TDocument).Name + " object is null");
 
             await _collection.InsertOneAsync(document);
+            return document;
         }
 
         public async Task InsertMany(ICollection<TDocument> documents)
@@ -107,7 +120,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 
             if (updateDefinition == null) throw new ArgumentNullException(nameof(updateDefinition));
 
-            updateDefinition.Set(doc => doc.UpdatedAt, DateTime.Now);
+            updateDefinition = updateDefinition.Set(doc => doc.UpdatedAt, DateTime.Now);
 
             await _collection.UpdateOneAsync(filter, updateDefinition);
         }

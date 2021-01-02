@@ -62,7 +62,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             //Mock GetCollection
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
 
-            var bookRepo = new FakeRepository(_mockContext.Object);
+            var bookRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             var result = await bookRepo.FindById(_fakeDoc.Id.ToString());
@@ -84,7 +84,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             //Mock GetCollection
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
 
-            var bookRepo = new FakeRepository(_mockContext.Object);
+            var bookRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             //Assert 
@@ -104,7 +104,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             //Mock GetCollection
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
 
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             var result = await fakeRepo.FindOne(f => !f.Active);
@@ -125,7 +125,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             _mockCollection.Setup(op => op.InsertOneAsync(_fakeDoc, null, default)).Returns(Task.CompletedTask);
 
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             await fakeRepo.InsertOne(_fakeDoc);
@@ -143,7 +143,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             _fakeDoc = null;
 
             //Act 
-            var bookRepo = new FakeRepository(_mockContext.Object);
+            var bookRepo = new FakeBaseRepository(_mockContext.Object);
 
             // Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => bookRepo.InsertOne(_fakeDoc));
@@ -162,7 +162,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             //Mock GetCollection
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
 
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
 
@@ -183,7 +183,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             //Mock GetCollection
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
 
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             var result = await fakeRepo.FilterBy(f => true);
@@ -226,7 +226,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             //Mock GetCollection
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
 
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             var result = await fakeRepo.FilterBy(f => f.Id == _fakeDoc.Id, p => new FakeDocumentProjection
@@ -265,7 +265,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
                 .Returns(Task.CompletedTask);
 
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             await fakeRepo.InsertMany(list);
@@ -280,7 +280,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
         {
             // Arrange
             //Act 
-            var bookRepo = new FakeRepository(_mockContext.Object);
+            var bookRepo = new FakeBaseRepository(_mockContext.Object);
 
             // Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => bookRepo.InsertMany(null));
@@ -302,7 +302,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
                 .ReturnsAsync(mockUpdateResult.Object);
 
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             await fakeRepo.DeleteOne(f => f.Id == ObjectId.GenerateNewId());
@@ -321,7 +321,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
         {
             // Arrange
             //Act 
-            var bookRepo = new FakeRepository(_mockContext.Object);
+            var bookRepo = new FakeBaseRepository(_mockContext.Object);
 
             // Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => bookRepo.DeleteOne(null));
@@ -343,7 +343,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
                 .ReturnsAsync(mockUpdateResult.Object);
 
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             await fakeRepo.DeleteById(_fakeDoc.Id.ToString());
@@ -364,7 +364,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             //Mock GetCollection
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
 
-            var bookRepo = new FakeRepository(_mockContext.Object);
+            var bookRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             //Assert 
@@ -387,7 +387,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
                 .ReturnsAsync(mockUpdateResult.Object);
 
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
             await fakeRepo.DeleteMany(f => !f.Active);
@@ -406,7 +406,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
         {
             // Arrange
             //Act 
-            var bookRepo = new FakeRepository(_mockContext.Object);
+            var bookRepo = new FakeBaseRepository(_mockContext.Object);
 
             // Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => bookRepo.DeleteMany(null));
@@ -428,7 +428,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
                 .ReturnsAsync(mockUpdateResult.Object);
 
             _mockContext.Setup(c => c.GetCollection()).Returns(_mockCollection.Object);
-            var fakeRepo = new FakeRepository(_mockContext.Object);
+            var fakeRepo = new FakeBaseRepository(_mockContext.Object);
 
             var updateDefinition = Builders<FakeDocument>.Update.Combine(
                 Builders<FakeDocument>.Update.Set(d => d.Name, "Novo nome"),
