@@ -2,9 +2,9 @@
 
 namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
 {
-    public class FakeRepository : BaseRepository<FakeDocument>
+    public class FakeBaseRepository : BaseRepository<FakeDocument>
     {
-        public FakeRepository(IDbContext<FakeDocument> context) : base(context)
+        public FakeBaseRepository(IDbContext<FakeDocument> context) : base(context)
         {
         }
     }

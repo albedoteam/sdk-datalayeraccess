@@ -18,7 +18,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 
         Task<TDocument> FindById(string id);
 
-        Task InsertOne(TDocument document);
+        Task<TDocument> InsertOne(TDocument document);
 
         Task InsertMany(ICollection<TDocument> documents);
 
