@@ -14,7 +14,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             services.AddSingleton<IDbSettings>(sp =>
                 sp.GetRequiredService<IOptions<DbSettings>>().Value);
 
-            services.AddTransient<IRepository, MongoRepository>();
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             return services;
         }
