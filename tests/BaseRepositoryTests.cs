@@ -65,7 +65,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
             var bookRepo = new FakeBaseRepository(_mockContext.Object);
 
             //Act
-            var result = await bookRepo.FindById(_fakeDoc.Id.ToString());
+            var result = await bookRepo.FindById(_fakeDoc.Id.ToString(), false);
 
             //Assert 
             Assert.NotNull(result);
@@ -88,7 +88,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
 
             //Act
             //Assert 
-            await Assert.ThrowsAsync<IndexOutOfRangeException>(() => bookRepo.FindById("123"));
+            await Assert.ThrowsAsync<IndexOutOfRangeException>(() => bookRepo.FindById("123", false));
         }
 
         [Fact]
