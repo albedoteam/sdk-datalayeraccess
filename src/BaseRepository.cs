@@ -11,13 +11,14 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
     public abstract class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocument : IDocument
     {
         private readonly IMongoCollection<TDocument> _collection;
-        protected IDbContext<TDocument> Context { get; }
 
         protected BaseRepository(IDbContext<TDocument> context)
         {
             Context = context;
             _collection = Context.GetCollection();
         }
+
+        protected IDbContext<TDocument> Context { get; }
 
         public async Task<IEnumerable<TDocument>> FilterBy(Expression<Func<TDocument, bool>> filterExpression)
         {
