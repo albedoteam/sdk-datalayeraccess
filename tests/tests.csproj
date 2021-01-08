@@ -6,7 +6,7 @@
 
         <IsPackable>false</IsPackable>
 
-        <AssemblyName>albedoteam-sdk-datalayeraccess-tests</AssemblyName>
+        <AssemblyName>AlbedoTeam.Sdk.DataLayerAccess.Tests</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
