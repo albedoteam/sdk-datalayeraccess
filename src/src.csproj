@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>AlbedoTeam.Sdk.DataLayerAccess</RootNamespace>
-        <AssemblyName>albedoteam-sdk-datalayeraccess</AssemblyName>
+        <AssemblyName>AlbedoTeam.Sdk.DataLayerAccess</AssemblyName>
     </PropertyGroup>
 
     <ItemGroup>
