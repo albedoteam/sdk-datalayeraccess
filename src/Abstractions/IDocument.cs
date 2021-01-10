@@ -12,10 +12,10 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 
         DateTime CreatedAt { get; }
 
-        DateTime UpdatedAt { get; }
+        DateTime? UpdatedAt { get; }
 
         bool IsDeleted { get; }
 
-        DateTime DeletedAt { get; }
+        DateTime? DeletedAt { get; }
     }
 }
