@@ -9,9 +9,17 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
     {
         public ObjectId Id { get; set; }
 
-        public DateTime CreatedAt => Id.CreationTime;
-        public DateTime UpdatedAt { get; set; }
+        // public DateTime CreatedAt => Id.CreationTime;
+
+        public DateTime CreatedAt { get; private set; }
+
+        public DateTime? UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
-        public DateTime DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
+
+        public Document()
+        {
+            CreatedAt = DateTime.UtcNow;
+        }
     }
 }
