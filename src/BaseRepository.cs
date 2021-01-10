@@ -28,7 +28,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
         }
 
         public async Task<(int totalPages, IReadOnlyList<TDocument> readOnlyList)> QueryByPage(
-            int page, 
+            int page,
             int pageSize,
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, object>> sortExpression)
@@ -38,7 +38,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                 {
                     PipelineStageDefinitionBuilder.Count<TDocument>()
                 }));
-            
+
             var dataFacet = AggregateFacet.Create("data",
                 PipelineDefinition<TDocument, TDocument>.Create(new[]
                 {
@@ -46,26 +46,32 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                     PipelineStageDefinitionBuilder.Skip<TDocument>((page - 1) * pageSize),
                     PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize),
                 }));
-            
+
             var aggregation = await _collection.Aggregate()
                 .Match(filterExpression)
                 .Facet(countFacet, dataFacet)
                 .ToListAsync();
-            
-            var count = aggregation.First()
+
+            var facetResults = aggregation.FirstOrDefault();
+            if (facetResults is null)
+            {
+                return (0, new List<TDocument>());
+            }
+
+            var count = facetResults
                 .Facets.First(x => x.Name == "count")
                 .Output<AggregateCountResult>()
                 .First()
                 .Count;
-            
-            var rest = (count % pageSize);
-            var totalPages = (int)count / pageSize;
+
+            var rest = count % pageSize;
+            var totalPages = (int) count / pageSize;
             if (rest > 0) totalPages += 1;
-            
-            var data = aggregation.First()
+
+            var data = facetResults
                 .Facets.First(x => x.Name == "data")
                 .Output<TDocument>();
-            
+
             return (totalPages, data);
         }
 
@@ -85,19 +91,19 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 
         public async Task<(int totalPages, IReadOnlyList<TProjected> readOnlyList)> QueryByPage<TProjected>(
             int page,
-            int pageSize, 
+            int pageSize,
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, TProjected>> projectionExpression,
             Expression<Func<TDocument, object>> sortExpression)
         {
             var projection = new FindExpressionProjectionDefinition<TDocument, TProjected>(projectionExpression);
-            
+
             var countFacet = AggregateFacet.Create("count",
                 PipelineDefinition<TProjected, AggregateCountResult>.Create(new[]
                 {
                     PipelineStageDefinitionBuilder.Count<TDocument>()
                 }));
-            
+
             var dataFacet = AggregateFacet.Create("data",
                 PipelineDefinition<TProjected, TProjected>.Create(new[]
                 {
@@ -105,27 +111,27 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                     PipelineStageDefinitionBuilder.Skip<TDocument>((page - 1) * pageSize),
                     PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize),
                 }));
-            
+
             var aggregation = await _collection.Aggregate()
                 .Match(filterExpression)
                 .Project(projection)
                 .Facet(countFacet, dataFacet)
                 .ToListAsync();
-            
+
             var count = aggregation.First()
                 .Facets.First(x => x.Name == "count")
                 .Output<AggregateCountResult>()
                 .First()
                 .Count;
-            
+
             var rest = (count % pageSize);
-            var totalPages = (int)count / pageSize;
+            var totalPages = (int) count / pageSize;
             if (rest > 0) totalPages += 1;
-            
+
             var data = aggregation.First()
                 .Facets.First(x => x.Name == "data")
                 .Output<TProjected>();
-            
+
             return (totalPages, data);
         }
 
