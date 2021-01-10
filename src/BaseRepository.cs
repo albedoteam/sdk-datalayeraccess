@@ -33,6 +33,8 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, object>> sortExpression)
         {
+            sortExpression ??= document => document.CreatedAt;
+
             var countFacet = AggregateFacet.Create("count",
                 PipelineDefinition<TDocument, AggregateCountResult>.Create(new[]
                 {
@@ -54,24 +56,30 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 
             var facetResults = aggregation.FirstOrDefault();
             if (facetResults is null)
-            {
                 return (0, new List<TDocument>());
-            }
 
-            var count = facetResults
-                .Facets.First(x => x.Name == "count")
+            var countFacetResult = facetResults.Facets.FirstOrDefault(f => f.Name == "count");
+            if (countFacetResult is null)
+                return (0, new List<TDocument>());
+
+            var countResult = countFacetResult
                 .Output<AggregateCountResult>()
-                .First()
-                .Count;
+                .FirstOrDefault();
+            
+            if (countResult is null)
+                return (0, new List<TDocument>());
+            
+            var count = countResult.Count;
 
             var rest = count % pageSize;
             var totalPages = (int) count / pageSize;
             if (rest > 0) totalPages += 1;
 
-            var data = facetResults
-                .Facets.First(x => x.Name == "data")
-                .Output<TDocument>();
-
+            var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");
+            if (dataFacetResults is null)
+                return (0, new List<TDocument>());
+            
+            var data = dataFacetResults.Output<TDocument>();
             return (totalPages, data);
         }
 
