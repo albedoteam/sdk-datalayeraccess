@@ -11,19 +11,19 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 {
     public abstract class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocument : IDocument
     {
-        private readonly IMongoCollection<TDocument> _collection;
+        protected readonly IMongoCollection<TDocument> Collection;
 
         protected BaseRepository(IDbContext<TDocument> context)
         {
             Context = context;
-            _collection = Context.GetCollection();
+            Collection = Context.GetCollection();
         }
 
         protected IDbContext<TDocument> Context { get; }
 
         public async Task<IEnumerable<TDocument>> FilterBy(Expression<Func<TDocument, bool>> filterExpression)
         {
-            var result = await _collection.FindAsync(filterExpression);
+            var result = await Collection.FindAsync(filterExpression);
             return result.ToEnumerable();
         }
 
@@ -33,6 +33,8 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, object>> sortExpression)
         {
+            sortExpression ??= document => document.CreatedAt;
+
             var countFacet = AggregateFacet.Create("count",
                 PipelineDefinition<TDocument, AggregateCountResult>.Create(new[]
                 {
@@ -47,31 +49,37 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                     PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize),
                 }));
 
-            var aggregation = await _collection.Aggregate()
+            var aggregation = await Collection.Aggregate()
                 .Match(filterExpression)
                 .Facet(countFacet, dataFacet)
                 .ToListAsync();
 
             var facetResults = aggregation.FirstOrDefault();
             if (facetResults is null)
-            {
                 return (0, new List<TDocument>());
-            }
 
-            var count = facetResults
-                .Facets.First(x => x.Name == "count")
+            var countFacetResult = facetResults.Facets.FirstOrDefault(f => f.Name == "count");
+            if (countFacetResult is null)
+                return (0, new List<TDocument>());
+
+            var countResult = countFacetResult
                 .Output<AggregateCountResult>()
-                .First()
-                .Count;
+                .FirstOrDefault();
+            
+            if (countResult is null)
+                return (0, new List<TDocument>());
+            
+            var count = countResult.Count;
 
             var rest = count % pageSize;
             var totalPages = (int) count / pageSize;
             if (rest > 0) totalPages += 1;
 
-            var data = facetResults
-                .Facets.First(x => x.Name == "data")
-                .Output<TDocument>();
-
+            var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");
+            if (dataFacetResults is null)
+                return (0, new List<TDocument>());
+            
+            var data = dataFacetResults.Output<TDocument>();
             return (totalPages, data);
         }
 
@@ -84,7 +92,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                 Projection = new FindExpressionProjectionDefinition<TDocument, TProjected>(projectionExpression)
             };
 
-            var result = await _collection.FindAsync(filterExpression, findOptions);
+            var result = await Collection.FindAsync(filterExpression, findOptions);
 
             return result.ToEnumerable();
         }
@@ -112,32 +120,44 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                     PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize),
                 }));
 
-            var aggregation = await _collection.Aggregate()
+            var aggregation = await Collection.Aggregate()
                 .Match(filterExpression)
                 .Project(projection)
                 .Facet(countFacet, dataFacet)
                 .ToListAsync();
+            
+            var facetResults = aggregation.FirstOrDefault();
+            if (facetResults is null)
+                return (0, new List<TProjected>());
 
-            var count = aggregation.First()
-                .Facets.First(x => x.Name == "count")
+            var countFacetResult = facetResults.Facets.FirstOrDefault(f => f.Name == "count");
+            if (countFacetResult is null)
+                return (0, new List<TProjected>());
+
+            var countResult = countFacetResult
                 .Output<AggregateCountResult>()
-                .First()
-                .Count;
+                .FirstOrDefault();
+            
+            if (countResult is null)
+                return (0, new List<TProjected>());
+            
+            var count = countResult.Count;
 
-            var rest = (count % pageSize);
+            var rest = count % pageSize;
             var totalPages = (int) count / pageSize;
             if (rest > 0) totalPages += 1;
 
-            var data = aggregation.First()
-                .Facets.First(x => x.Name == "data")
-                .Output<TProjected>();
-
+            var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");
+            if (dataFacetResults is null)
+                return (0, new List<TProjected>());
+            
+            var data = dataFacetResults.Output<TProjected>();
             return (totalPages, data);
         }
 
         public async Task<TDocument> FindOne(Expression<Func<TDocument, bool>> filterExpression)
         {
-            return (await _collection.FindAsync(filterExpression)).FirstOrDefault();
+            return (await Collection.FindAsync(filterExpression)).FirstOrDefault();
         }
 
         public async Task<TDocument> FindById(string id, bool showDeleted)
@@ -156,14 +176,14 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                     Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId),
                     Builders<TDocument>.Filter.Eq(doc => doc.IsDeleted, false));
 
-            return (await _collection.FindAsync(filter)).SingleOrDefault();
+            return (await Collection.FindAsync(filter)).SingleOrDefault();
         }
 
         public async Task<TDocument> InsertOne(TDocument document)
         {
             if (document == null) throw new ArgumentNullException(typeof(TDocument).Name + " object is null");
 
-            await _collection.InsertOneAsync(document);
+            await Collection.InsertOneAsync(document);
             return document;
         }
 
@@ -172,7 +192,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             if (documents == null)
                 throw new ArgumentNullException(typeof(TDocument).Name + " object collection is null");
 
-            await _collection.InsertManyAsync(documents);
+            await Collection.InsertManyAsync(documents);
         }
 
         public async Task DeleteById(string id)
@@ -184,7 +204,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                 Builders<TDocument>.Update.Set(d => d.IsDeleted, true),
                 Builders<TDocument>.Update.Set(d => d.DeletedAt, DateTime.Now));
 
-            await _collection.UpdateOneAsync(filter, update);
+            await Collection.UpdateOneAsync(filter, update);
         }
 
         public async Task DeleteOne(Expression<Func<TDocument, bool>> filterExpression)
@@ -195,7 +215,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                 Builders<TDocument>.Update.Set(d => d.IsDeleted, true),
                 Builders<TDocument>.Update.Set(d => d.DeletedAt, DateTime.Now));
 
-            await _collection.UpdateOneAsync(filterExpression, update);
+            await Collection.UpdateOneAsync(filterExpression, update);
         }
 
         public async Task DeleteMany(Expression<Func<TDocument, bool>> filterExpression)
@@ -206,7 +226,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                 Builders<TDocument>.Update.Set(d => d.IsDeleted, true),
                 Builders<TDocument>.Update.Set(d => d.DeletedAt, DateTime.Now));
 
-            await _collection.UpdateManyAsync(filterExpression, update);
+            await Collection.UpdateManyAsync(filterExpression, update);
         }
 
         public async Task UpdateById(string id, UpdateDefinition<TDocument> updateDefinition)
@@ -218,7 +238,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 
             updateDefinition = updateDefinition.Set(doc => doc.UpdatedAt, DateTime.Now);
 
-            await _collection.UpdateOneAsync(filter, updateDefinition);
+            await Collection.UpdateOneAsync(filter, updateDefinition);
         }
     }
 }
