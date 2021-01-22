@@ -13,8 +13,8 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
         Task<(int totalPages, IReadOnlyList<TDocument> readOnlyList)> QueryByPage(
             int page,
             int pageSize,
-            Expression<Func<TDocument, bool>> filterExpression,
-            Expression<Func<TDocument, object>> sortExpression);
+            FilterDefinition<TDocument> filterDefinition,
+            SortDefinition<TDocument> sortDefinition = null);
         
         Task<IEnumerable<TProjected>> FilterBy<TProjected>(
             Expression<Func<TDocument, bool>> filterExpression,
@@ -23,9 +23,9 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
         Task<(int totalPages, IReadOnlyList<TProjected> readOnlyList)> QueryByPage<TProjected>(
             int page,
             int pageSize,
-            Expression<Func<TDocument, bool>> filterExpression,
-            Expression<Func<TDocument, TProjected>> projectionExpression,
-            Expression<Func<TDocument, object>> sortExpression);
+            FilterDefinition<TDocument> filterDefinition,
+            FindExpressionProjectionDefinition<TDocument, TProjected> projectionDefinition,
+            SortDefinition<TDocument> sortDefinition = null);
 
         Task<TDocument> FindOne(Expression<Func<TDocument, bool>> filterExpression);
 

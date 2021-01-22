@@ -30,10 +30,10 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
         public async Task<(int totalPages, IReadOnlyList<TDocument> readOnlyList)> QueryByPage(
             int page,
             int pageSize,
-            Expression<Func<TDocument, bool>> filterExpression,
-            Expression<Func<TDocument, object>> sortExpression)
+            FilterDefinition<TDocument> filterDefinition,
+            SortDefinition<TDocument> sortDefinition = null)
         {
-            sortExpression ??= document => document.CreatedAt;
+            sortDefinition ??= Builders<TDocument>.Sort.Ascending(a => a.CreatedAt);
 
             var countFacet = AggregateFacet.Create("count",
                 PipelineDefinition<TDocument, AggregateCountResult>.Create(new[]
@@ -44,13 +44,19 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             var dataFacet = AggregateFacet.Create("data",
                 PipelineDefinition<TDocument, TDocument>.Create(new[]
                 {
-                    PipelineStageDefinitionBuilder.Sort(Builders<TDocument>.Sort.Ascending(sortExpression)),
+                    PipelineStageDefinitionBuilder.Sort(sortDefinition),
                     PipelineStageDefinitionBuilder.Skip<TDocument>((page - 1) * pageSize),
                     PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize),
                 }));
 
-            var aggregation = await Collection.Aggregate()
-                .Match(filterExpression)
+            // turning case insentive for indexes (find and sort) .. indexes needs to be created at mongodb
+            var options = new AggregateOptions
+            {
+                Collation = new Collation("en", strength: CollationStrength.Secondary)
+            };
+            
+            var aggregation = await Collection.Aggregate(options)
+                .Match(filterDefinition)
                 .Facet(countFacet, dataFacet)
                 .ToListAsync();
 
@@ -100,12 +106,10 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
         public async Task<(int totalPages, IReadOnlyList<TProjected> readOnlyList)> QueryByPage<TProjected>(
             int page,
             int pageSize,
-            Expression<Func<TDocument, bool>> filterExpression,
-            Expression<Func<TDocument, TProjected>> projectionExpression,
-            Expression<Func<TDocument, object>> sortExpression)
+            FilterDefinition<TDocument> filterDefinition,
+            FindExpressionProjectionDefinition<TDocument, TProjected> projectionDefinition,
+            SortDefinition<TDocument> sortDefinition = null)
         {
-            var projection = new FindExpressionProjectionDefinition<TDocument, TProjected>(projectionExpression);
-
             var countFacet = AggregateFacet.Create("count",
                 PipelineDefinition<TProjected, AggregateCountResult>.Create(new[]
                 {
@@ -115,14 +119,20 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             var dataFacet = AggregateFacet.Create("data",
                 PipelineDefinition<TProjected, TProjected>.Create(new[]
                 {
-                    PipelineStageDefinitionBuilder.Sort(Builders<TDocument>.Sort.Ascending(sortExpression)),
+                    PipelineStageDefinitionBuilder.Sort(sortDefinition),
                     PipelineStageDefinitionBuilder.Skip<TDocument>((page - 1) * pageSize),
                     PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize),
                 }));
 
-            var aggregation = await Collection.Aggregate()
-                .Match(filterExpression)
-                .Project(projection)
+            // turning case insentive for indexes (find and sort) .. indexes needs to be created at mongodb
+            var options = new AggregateOptions
+            {
+                Collation = new Collation("en", strength: CollationStrength.Secondary)
+            };
+            
+            var aggregation = await Collection.Aggregate(options)
+                .Match(filterDefinition)
+                .Project(projectionDefinition)
                 .Facet(countFacet, dataFacet)
                 .ToListAsync();
             
