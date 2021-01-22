@@ -2,7 +2,7 @@
 
 namespace AlbedoTeam.Sdk.DataLayerAccess
 {
-    public class DbSettings : IDbSettings
+    internal class DbSettings : IDbSettings
     {
         public string ConnectionString { get; set; }
         public string DatabaseName { get; set; }
