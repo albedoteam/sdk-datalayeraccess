@@ -10,11 +10,11 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
     public abstract class BaseRepositoryWithAccount<TDocument> : IBaseRepositoryWithAccount<TDocument>
         where TDocument : IDocumentWithAccount
     {
-        private readonly IBaseRepository<TDocument> _baseRepository;
+        protected IBaseRepository<TDocument> BaseRepository { get; }
 
         protected BaseRepositoryWithAccount(IBaseRepository<TDocument> baseRepository)
         {
-            _baseRepository = baseRepository;
+            BaseRepository = baseRepository;
         }
 
         public async Task<IEnumerable<TDocument>> FilterBy(
@@ -22,7 +22,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             Expression<Func<TDocument, bool>> filterExpression)
         {
             var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
-            return await _baseRepository.FilterBy(filter);
+            return await BaseRepository.FilterBy(filter);
         }
 
         public async Task<(int totalPages, IReadOnlyList<TDocument> readOnlyList)> QueryByPage(
@@ -34,7 +34,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
         {
             var accountFilter = Builders<TDocument>.Filter.Eq(doc => doc.AccountId, accountId);
             filterDefinition &= accountFilter;
-            return await _baseRepository.QueryByPage(page, pageSize, filterDefinition, sortDefinition);
+            return await BaseRepository.QueryByPage(page, pageSize, filterDefinition, sortDefinition);
         }
 
         public async Task<IEnumerable<TProjected>> FilterBy<TProjected>(
@@ -43,7 +43,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             Expression<Func<TDocument, TProjected>> projectionExpression)
         {
             var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
-            return await _baseRepository.FilterBy(filter, projectionExpression);
+            return await BaseRepository.FilterBy(filter, projectionExpression);
         }
 
         public async Task<(int totalPages, IReadOnlyList<TProjected> readOnlyList)> QueryByPage<TProjected>(
@@ -57,7 +57,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             var accountFilter = Builders<TDocument>.Filter.Eq(doc => doc.AccountId, accountId);
             filterDefinition &= accountFilter;
 
-            return await _baseRepository.QueryByPage(
+            return await BaseRepository.QueryByPage(
                 page,
                 pageSize,
                 filterDefinition,
@@ -68,48 +68,48 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
         public async Task<TDocument> FindOne(string accountId, Expression<Func<TDocument, bool>> filterExpression)
         {
             var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
-            return await _baseRepository.FindOne(filter);
+            return await BaseRepository.FindOne(filter);
         }
 
         public async Task<TDocument> FindById(string accountId, string id, bool showDeleted = false)
         {
             var accountFilter = Builders<TDocument>.Filter.Eq(doc => doc.AccountId, accountId);
-            return await _baseRepository.FindById(id, showDeleted, accountFilter);
+            return await BaseRepository.FindById(id, showDeleted, accountFilter);
         }
 
         public async Task<TDocument> InsertOne(TDocument document)
         {
-            return await _baseRepository.InsertOne(document);
+            return await BaseRepository.InsertOne(document);
         }
 
         public async Task InsertMany(ICollection<TDocument> documents)
         {
-            await _baseRepository.InsertMany(documents);
+            await BaseRepository.InsertMany(documents);
         }
 
         public async Task DeleteById(string accountId, string id)
         {
             var accountFilter = Builders<TDocument>.Filter.Eq(doc => doc.AccountId, accountId);
-            await _baseRepository.DeleteById(id, accountFilter);
+            await BaseRepository.DeleteById(id, accountFilter);
         }
 
         public async Task DeleteOne(string accountId, Expression<Func<TDocument, bool>> filterExpression)
         {
             var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
-            await _baseRepository.DeleteOne(filter);
+            await BaseRepository.DeleteOne(filter);
         }
 
         public async Task DeleteMany(string accountId, Expression<Func<TDocument, bool>> filterExpression)
         {
             var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
-            await _baseRepository.DeleteMany(filter);
+            await BaseRepository.DeleteMany(filter);
         }
 
         public async Task UpdateById(string accountId, string id, UpdateDefinition<TDocument> updateDefinition,
             FilterDefinition<TDocument> aditionalFilter = null)
         {
             var accountFilter = Builders<TDocument>.Filter.Eq(doc => doc.AccountId, accountId);
-            await _baseRepository.UpdateById(id, updateDefinition, accountFilter);
+            await BaseRepository.UpdateById(id, updateDefinition, accountFilter);
         }
 
         private static Expression<Func<TDocument, bool>> ExpressionCombine(
