@@ -37,12 +37,15 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 
         Task InsertMany(ICollection<TDocument> documents);
 
-        Task DeleteById(string id);
+        Task DeleteById(string id, FilterDefinition<TDocument> aditionalFilter = null);
 
         Task DeleteOne(Expression<Func<TDocument, bool>> filterExpression);
 
         Task DeleteMany(Expression<Func<TDocument, bool>> filterExpression);
 
-        Task UpdateById(string id, UpdateDefinition<TDocument> updateDefinition);
+        Task UpdateById(
+            string id,
+            UpdateDefinition<TDocument> updateDefinition,
+            FilterDefinition<TDocument> aditionalFilter = null);
     }
 }

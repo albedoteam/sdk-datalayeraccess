@@ -211,7 +211,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             await Collection.InsertManyAsync(documents);
         }
 
-        public async Task DeleteById(string id)
+        public async Task DeleteById(string id, FilterDefinition<TDocument> aditionalFilter = null)
         {
             var objectId = new ObjectId(id);
             var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId);
@@ -245,7 +245,8 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             await Collection.UpdateManyAsync(filterExpression, update);
         }
 
-        public async Task UpdateById(string id, UpdateDefinition<TDocument> updateDefinition)
+        public async Task UpdateById(string id, UpdateDefinition<TDocument> updateDefinition,
+            FilterDefinition<TDocument> aditionalFilter = null)
         {
             var objectId = new ObjectId(id);
             var filter = Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId);
