@@ -46,7 +46,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                 {
                     PipelineStageDefinitionBuilder.Sort(sortDefinition),
                     PipelineStageDefinitionBuilder.Skip<TDocument>((page - 1) * pageSize),
-                    PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize),
+                    PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize)
                 }));
 
             // turning case insentive for indexes (find and sort) .. indexes needs to be created at mongodb
@@ -54,7 +54,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             {
                 Collation = new Collation("en", strength: CollationStrength.Secondary)
             };
-            
+
             var aggregation = await Collection.Aggregate(options)
                 .Match(filterDefinition)
                 .Facet(countFacet, dataFacet)
@@ -71,10 +71,10 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             var countResult = countFacetResult
                 .Output<AggregateCountResult>()
                 .FirstOrDefault();
-            
+
             if (countResult is null)
                 return (0, new List<TDocument>());
-            
+
             var count = countResult.Count;
 
             var rest = count % pageSize;
@@ -84,7 +84,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");
             if (dataFacetResults is null)
                 return (0, new List<TDocument>());
-            
+
             var data = dataFacetResults.Output<TDocument>();
             return (totalPages, data);
         }
@@ -121,7 +121,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                 {
                     PipelineStageDefinitionBuilder.Sort(sortDefinition),
                     PipelineStageDefinitionBuilder.Skip<TDocument>((page - 1) * pageSize),
-                    PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize),
+                    PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize)
                 }));
 
             // turning case insentive for indexes (find and sort) .. indexes needs to be created at mongodb
@@ -129,13 +129,13 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             {
                 Collation = new Collation("en", strength: CollationStrength.Secondary)
             };
-            
+
             var aggregation = await Collection.Aggregate(options)
                 .Match(filterDefinition)
                 .Project(projectionDefinition)
                 .Facet(countFacet, dataFacet)
                 .ToListAsync();
-            
+
             var facetResults = aggregation.FirstOrDefault();
             if (facetResults is null)
                 return (0, new List<TProjected>());
@@ -147,10 +147,10 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             var countResult = countFacetResult
                 .Output<AggregateCountResult>()
                 .FirstOrDefault();
-            
+
             if (countResult is null)
                 return (0, new List<TProjected>());
-            
+
             var count = countResult.Count;
 
             var rest = count % pageSize;
@@ -160,7 +160,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");
             if (dataFacetResults is null)
                 return (0, new List<TProjected>());
-            
+
             var data = dataFacetResults.Output<TProjected>();
             return (totalPages, data);
         }
@@ -170,7 +170,10 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             return (await Collection.FindAsync(filterExpression)).FirstOrDefault();
         }
 
-        public async Task<TDocument> FindById(string id, bool showDeleted)
+        public async Task<TDocument> FindById(
+            string id,
+            bool showDeleted,
+            FilterDefinition<TDocument> aditionalFilter = null)
         {
             var objectId = new ObjectId(id);
 
@@ -185,6 +188,9 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
                 filter = Builders<TDocument>.Filter.And(
                     Builders<TDocument>.Filter.Eq(doc => doc.Id, objectId),
                     Builders<TDocument>.Filter.Eq(doc => doc.IsDeleted, false));
+
+            if (aditionalFilter is { })
+                filter &= aditionalFilter;
 
             return (await Collection.FindAsync(filter)).SingleOrDefault();
         }

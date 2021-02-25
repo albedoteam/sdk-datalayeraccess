@@ -15,11 +15,11 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
             int pageSize,
             FilterDefinition<TDocument> filterDefinition,
             SortDefinition<TDocument> sortDefinition = null);
-        
+
         Task<IEnumerable<TProjected>> FilterBy<TProjected>(
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, TProjected>> projectionExpression);
-        
+
         Task<(int totalPages, IReadOnlyList<TProjected> readOnlyList)> QueryByPage<TProjected>(
             int page,
             int pageSize,
@@ -29,7 +29,9 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 
         Task<TDocument> FindOne(Expression<Func<TDocument, bool>> filterExpression);
 
-        Task<TDocument> FindById(string id, bool showDeleted = false);
+        Task<TDocument> FindById(string id,
+            bool showDeleted = false,
+            FilterDefinition<TDocument> aditionalFilter = null);
 
         Task<TDocument> InsertOne(TDocument document);
 
