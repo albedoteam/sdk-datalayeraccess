@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
 using MongoDB.Driver;
 
-namespace AlbedoTeam.Sdk.DataLayerAccess
+namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
 {
     public class HelpersWithAccount<TDocument> : IHelpersWithAccount<TDocument>
         where TDocument : IDocumentWithAccount, new()

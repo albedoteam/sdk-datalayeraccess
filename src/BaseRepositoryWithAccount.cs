@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
+using AlbedoTeam.Sdk.DataLayerAccess.Utils;
 using MongoDB.Driver;
 
 namespace AlbedoTeam.Sdk.DataLayerAccess
@@ -25,7 +26,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             string accountId,
             Expression<Func<TDocument, bool>> filterExpression)
         {
-            var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
+            var filter = filterExpression.AndAlso(a => a.AccountId == accountId);
             return await BaseRepository.FilterBy(filter);
         }
 
@@ -46,7 +47,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             Expression<Func<TDocument, bool>> filterExpression,
             Expression<Func<TDocument, TProjected>> projectionExpression)
         {
-            var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
+            var filter = filterExpression.AndAlso(a => a.AccountId == accountId);
             return await BaseRepository.FilterBy(filter, projectionExpression);
         }
 
@@ -71,7 +72,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 
         public async Task<TDocument> FindOne(string accountId, Expression<Func<TDocument, bool>> filterExpression)
         {
-            var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
+            var filter = filterExpression.AndAlso(a => a.AccountId == accountId);
             return await BaseRepository.FindOne(filter);
         }
 
@@ -99,13 +100,13 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 
         public async Task DeleteOne(string accountId, Expression<Func<TDocument, bool>> filterExpression)
         {
-            var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
+            var filter = filterExpression.AndAlso(a => a.AccountId == accountId);
             await BaseRepository.DeleteOne(filter);
         }
 
         public async Task DeleteMany(string accountId, Expression<Func<TDocument, bool>> filterExpression)
         {
-            var filter = ExpressionCombine(filterExpression, a => a.AccountId == accountId);
+            var filter = filterExpression.AndAlso(a => a.AccountId == accountId);
             await BaseRepository.DeleteMany(filter);
         }
 
@@ -114,15 +115,6 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
         {
             var accountFilter = Builders<TDocument>.Filter.Eq(doc => doc.AccountId, accountId);
             await BaseRepository.UpdateById(id, updateDefinition, accountFilter);
-        }
-
-        private static Expression<Func<TDocument, bool>> ExpressionCombine(
-            Expression<Func<TDocument, bool>> filterExpression,
-            Expression<Func<TDocument, bool>> accountFilter)
-        {
-            var body = Expression.AndAlso(filterExpression.Body, accountFilter.Body);
-            var lambda = Expression.Lambda<Func<TDocument, bool>>(body, filterExpression.Parameters[0]);
-            return lambda;
         }
     }
 }

@@ -5,7 +5,7 @@ using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
-namespace AlbedoTeam.Sdk.DataLayerAccess
+namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
 {
     public class Helpers<TDocument> : IHelpers<TDocument> where TDocument : IDocument, new()
     {

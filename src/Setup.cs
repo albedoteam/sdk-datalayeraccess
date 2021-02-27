@@ -1,5 +1,6 @@
 ﻿using System;
 using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
+using AlbedoTeam.Sdk.DataLayerAccess.Utils;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AlbedoTeam.Sdk.DataLayerAccess
@@ -18,6 +19,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 
             services.AddScoped(typeof(IHelpers<>), typeof(Helpers<>));
             services.AddScoped(typeof(IHelpersWithAccount<>), typeof(HelpersWithAccount<>));
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepositoryImpl<>));
 
             return services;
         }
