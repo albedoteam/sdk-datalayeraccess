@@ -1,11 +1,9 @@
-﻿using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
 {
-    public class FakeBaseRepository : BaseRepository<FakeDocument>
-    {
-        public FakeBaseRepository(IDbContext<FakeDocument> context) : base(context)
-        {
-        }
-    }
+    // public class FakeBaseRepository : BaseRepository<FakeDocument>
+    // {
+    //     public FakeBaseRepository(IDbContext<FakeDocument> context) : base(context)
+    //     {
+    //     }
+    // }
 }

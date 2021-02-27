@@ -8,6 +8,8 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 {
     public interface IBaseRepository<TDocument> where TDocument : IDocument
     {
+        IHelpers<TDocument> Helpers { get; }
+
         Task<IEnumerable<TDocument>> FilterBy(Expression<Func<TDocument, bool>> filterExpression);
 
         Task<(int totalPages, IReadOnlyList<TDocument> readOnlyList)> QueryByPage(

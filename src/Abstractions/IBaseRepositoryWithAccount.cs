@@ -8,6 +8,8 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 {
     public interface IBaseRepositoryWithAccount<TDocument> where TDocument : IDocumentWithAccount
     {
+        IHelpersWithAccount<TDocument> Helpers { get; }
+
         Task<IEnumerable<TDocument>> FilterBy(
             string accountId,
             Expression<Func<TDocument, bool>> filterExpression);

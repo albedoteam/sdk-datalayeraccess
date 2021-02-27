@@ -10,12 +10,16 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
     public abstract class BaseRepositoryWithAccount<TDocument> : IBaseRepositoryWithAccount<TDocument>
         where TDocument : IDocumentWithAccount
     {
-        protected IBaseRepository<TDocument> BaseRepository { get; }
-
-        protected BaseRepositoryWithAccount(IBaseRepository<TDocument> baseRepository)
+        protected BaseRepositoryWithAccount(
+            IBaseRepository<TDocument> baseRepository,
+            IHelpersWithAccount<TDocument> helpers)
         {
             BaseRepository = baseRepository;
+            Helpers = helpers;
         }
+
+        protected IBaseRepository<TDocument> BaseRepository { get; }
+        public IHelpersWithAccount<TDocument> Helpers { get; }
 
         public async Task<IEnumerable<TDocument>> FilterBy(
             string accountId,

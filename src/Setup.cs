@@ -16,6 +16,9 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             services.AddSingleton(dbSettings);
             services.AddScoped(typeof(IDbContext<>), typeof(DbContext<>));
 
+            services.AddScoped(typeof(IHelpers<>), typeof(Helpers<>));
+            services.AddScoped(typeof(IHelpersWithAccount<>), typeof(HelpersWithAccount<>));
+
             return services;
         }
     }
