@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq.Expressions;
-using MongoDB.Driver;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 {
+    using System;
+    using System.Linq.Expressions;
+    using MongoDB.Driver;
+
     public interface IHelpers<TDocument> where TDocument : IDocument
     {
         SortDefinition<TDocument> CreateSorting(string orderBy, string sorting);

@@ -1,9 +1,9 @@
-﻿using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-using AlbedoTeam.Sdk.DataLayerAccess.Attributes;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
 {
-    [BsonCollection("fakeDocs")]
+    using Abstractions;
+    using Attributes;
+
+    [Collection("fakeDocs")]
     public class FakeDocument : Document
     {
         public string Name { get; set; }

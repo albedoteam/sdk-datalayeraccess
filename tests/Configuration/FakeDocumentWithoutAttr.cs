@@ -1,7 +1,7 @@
-﻿using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
 {
+    using Abstractions;
+
     public abstract class FakeDocumentWithoutAttr : Document
     {
     }

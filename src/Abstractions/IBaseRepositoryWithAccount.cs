@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using MongoDB.Driver;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
+    using MongoDB.Driver;
+
     public interface IBaseRepositoryWithAccount<TDocument> where TDocument : IDocumentWithAccount
     {
         IHelpersWithAccount<TDocument> Helpers { get; }

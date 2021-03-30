@@ -1,11 +1,11 @@
-using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-using AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration;
-using MongoDB.Driver;
-using Moq;
-using Xunit;
-
 namespace AlbedoTeam.Sdk.DataLayerAccess.Tests
 {
+    using Abstractions;
+    using Configuration;
+    using MongoDB.Driver;
+    using Moq;
+    using Xunit;
+
     public class MongoDbContextTests
     {
         private readonly Mock<IMongoClient> _mockClient;

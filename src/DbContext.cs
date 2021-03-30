@@ -1,11 +1,11 @@
-﻿using System.Linq;
-using System.Reflection;
-using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-using AlbedoTeam.Sdk.DataLayerAccess.Attributes;
-using MongoDB.Driver;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess
 {
+    using System.Linq;
+    using System.Reflection;
+    using Abstractions;
+    using Attributes;
+    using MongoDB.Driver;
+
     public class DbContext<TDocument> : IDbContext<TDocument> where TDocument : IDocument
     {
         private readonly IMongoDatabase _db;
@@ -23,9 +23,9 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
 
         private static string GetCollectionName(ICustomAttributeProvider documentType)
         {
-            return ((BsonCollectionAttribute) documentType.GetCustomAttributes(
-                    typeof(BsonCollectionAttribute), true)
-                .FirstOrDefault())?.CollectionName;
+            return ((CollectionAttribute) documentType.GetCustomAttributes(
+                    typeof(CollectionAttribute), true)
+                .FirstOrDefault())?.Name;
         }
     }
 }

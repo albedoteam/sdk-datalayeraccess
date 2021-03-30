@@ -1,7 +1,7 @@
-﻿using System.Linq.Expressions;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
 {
+    using System.Linq.Expressions;
+
     internal class ReplaceExpressionVisitor : ExpressionVisitor
     {
         private readonly Expression _newValue;

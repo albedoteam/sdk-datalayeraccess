@@ -1,10 +1,11 @@
-﻿using System;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
 {
-    [BsonIgnoreExtraElements]
+    using System;
+    using Migrations.Documents.Structs;
+    using MongoDB.Bson;
+    using MongoDB.Bson.Serialization.Attributes;
+
+    [BsonIgnoreExtraElements(Inherited = true)]
     public abstract class Document : IDocument
     {
         public Document()
@@ -13,6 +14,7 @@ namespace AlbedoTeam.Sdk.DataLayerAccess.Abstractions
         }
 
         public ObjectId Id { get; set; }
+        public DocumentVersion Version { get; set; }
 
         // public DateTime CreatedAt => Id.CreationTime;
 

@@ -1,10 +1,13 @@
-﻿using System;
-using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-using AlbedoTeam.Sdk.DataLayerAccess.Utils;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess
 {
+    using System;
+    using Abstractions;
+    using Microsoft.Extensions.DependencyInjection;
+    using Migrations.Documents.Structs;
+    using Migrations.Startup;
+    using MongoDB.Driver;
+    using Utils;
+
     public static class Setup
     {
         public static IServiceCollection AddDataLayerAccess(
@@ -20,6 +23,17 @@ namespace AlbedoTeam.Sdk.DataLayerAccess
             services.AddScoped(typeof(IHelpers<>), typeof(Helpers<>));
             services.AddScoped(typeof(IHelpersWithAccount<>), typeof(HelpersWithAccount<>));
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepositoryImpl<>));
+
+            // remove mongo client here?
+            var mongoClient = new MongoClient(dbSettings.ConnectionString);
+            services.AddSingleton<IMongoClient>(mongoClient);
+            services.AddMigration(new MigrationSettings
+            {
+                ConnectionString = dbSettings.ConnectionString,
+                Database = dbSettings.DatabaseName,
+                RunMigrations = dbSettings.RunMigrations,
+                DatabaseMigrationVersion = new DocumentVersion(dbSettings.DatabaseMigrationVersion)
+            });
 
             return services;
         }

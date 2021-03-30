@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-using AlbedoTeam.Sdk.DataLayerAccess.Utils;
-using MongoDB.Driver;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
+    using Abstractions;
+    using MongoDB.Driver;
+    using Utils;
+
     public abstract class BaseRepositoryWithAccount<TDocument> : IBaseRepositoryWithAccount<TDocument>
         where TDocument : IDocumentWithAccount
     {

@@ -1,7 +1,7 @@
-﻿using MongoDB.Bson;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Tests.Configuration
 {
+    using MongoDB.Bson;
+
     public class FakeDocumentProjection
     {
         public ObjectId Id { get; set; }

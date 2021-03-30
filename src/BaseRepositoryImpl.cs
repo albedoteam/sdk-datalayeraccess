@@ -1,9 +1,9 @@
-﻿using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess
 {
+    using Abstractions;
+
     /// <summary>
-    /// This concret class is needed to use the IBaseRespositoryWithAccount
+    ///     This concret class is needed to use the IBaseRespositoryWithAccount
     /// </summary>
     /// <typeparam name="TDocument">Model</typeparam>
     public class BaseRepositoryImpl<TDocument> : BaseRepository<TDocument>

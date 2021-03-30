@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq.Expressions;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
 {
+    using System;
+    using System.Linq.Expressions;
+
     internal static class ExpressionExtensions
     {
         public static Expression<Func<TDocument, bool>> AndAlso<TDocument>(

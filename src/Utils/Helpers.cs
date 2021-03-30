@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-using MongoDB.Bson;
-using MongoDB.Driver;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
 {
+    using System;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using Abstractions;
+    using MongoDB.Bson;
+    using MongoDB.Driver;
+
     public class Helpers<TDocument> : IHelpers<TDocument> where TDocument : IDocument, new()
     {
         public SortDefinition<TDocument> CreateSorting(string orderBy, string sorting)

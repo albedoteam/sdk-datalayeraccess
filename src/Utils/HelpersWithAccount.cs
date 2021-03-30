@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq.Expressions;
-using AlbedoTeam.Sdk.DataLayerAccess.Abstractions;
-using MongoDB.Driver;
-
-namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
+﻿namespace AlbedoTeam.Sdk.DataLayerAccess.Utils
 {
+    using System;
+    using System.Linq.Expressions;
+    using Abstractions;
+    using MongoDB.Driver;
+
     public class HelpersWithAccount<TDocument> : IHelpersWithAccount<TDocument>
         where TDocument : IDocumentWithAccount, new()
     {
