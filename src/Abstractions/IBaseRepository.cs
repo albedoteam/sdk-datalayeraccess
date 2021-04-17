@@ -5,7 +5,6 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using MongoDB.Driver;
-    using Utils;
     using Utils.Query;
 
     public interface IBaseRepository<TDocument> where TDocument : class, IDocument, new()

@@ -8,7 +8,6 @@
     using Abstractions;
     using MongoDB.Bson;
     using MongoDB.Driver;
-    using Utils;
     using Utils.Query;
 
     public abstract class BaseRepository<TDocument> : IBaseRepository<TDocument>
@@ -63,18 +62,18 @@
 
             var facetResults = aggregation.FirstOrDefault();
             if (facetResults is null)
-                return new QueryResponse<TDocument>(0, 0, 0, null);
+                return new QueryResponse<TDocument>(0, 0, 0, new List<TDocument>());
 
             var countFacetResult = facetResults.Facets.FirstOrDefault(f => f.Name == "count");
             if (countFacetResult is null)
-                return new QueryResponse<TDocument>(0, 0, 0, null);
+                return new QueryResponse<TDocument>(0, 0, 0, new List<TDocument>());
 
             var countResult = countFacetResult
                 .Output<AggregateCountResult>()
                 .FirstOrDefault();
 
             if (countResult is null)
-                return new QueryResponse<TDocument>(0, 0, 0, null);
+                return new QueryResponse<TDocument>(0, 0, 0, new List<TDocument>());
 
             var count = countResult.Count;
 
@@ -84,7 +83,7 @@
 
             var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");
             if (dataFacetResults is null)
-                return new QueryResponse<TDocument>(0, 0, 0, null);
+                return new QueryResponse<TDocument>(0, 0, 0, new List<TDocument>());
 
             var data = dataFacetResults.Output<TDocument>();
             return new QueryResponse<TDocument>(queryRequest.Page, queryRequest.PageSize, totalPages, data);
