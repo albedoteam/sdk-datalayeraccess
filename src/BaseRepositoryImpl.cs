@@ -7,7 +7,7 @@
     /// </summary>
     /// <typeparam name="TDocument">Model</typeparam>
     public class BaseRepositoryImpl<TDocument> : BaseRepository<TDocument>
-        where TDocument : IDocument
+        where TDocument : class, IDocument, new()
     {
         public BaseRepositoryImpl(IDbContext<TDocument> context, IHelpers<TDocument> helpers) : base(context, helpers)
         {

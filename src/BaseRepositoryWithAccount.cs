@@ -7,9 +7,10 @@
     using Abstractions;
     using MongoDB.Driver;
     using Utils;
+    using Utils.Query;
 
     public abstract class BaseRepositoryWithAccount<TDocument> : IBaseRepositoryWithAccount<TDocument>
-        where TDocument : IDocumentWithAccount
+        where TDocument : class, IDocumentWithAccount, new()
     {
         protected BaseRepositoryWithAccount(
             IBaseRepository<TDocument> baseRepository,
@@ -30,16 +31,12 @@
             return await BaseRepository.FilterBy(filter);
         }
 
-        public async Task<(int totalPages, IReadOnlyList<TDocument> readOnlyList)> QueryByPage(
-            string accountId,
-            int page,
-            int pageSize,
-            FilterDefinition<TDocument> filterDefinition,
-            SortDefinition<TDocument> sortDefinition = null)
+        public async Task<QueryResponse<TDocument>> QueryByPage(string accountId, QueryRequest<TDocument> queryRequest)
         {
             var accountFilter = Builders<TDocument>.Filter.Eq(doc => doc.AccountId, accountId);
-            filterDefinition &= accountFilter;
-            return await BaseRepository.QueryByPage(page, pageSize, filterDefinition, sortDefinition);
+            queryRequest.FilterDefinition &= accountFilter;
+
+            return await BaseRepository.QueryByPage(queryRequest);
         }
 
         public async Task<IEnumerable<TProjected>> FilterBy<TProjected>(

@@ -5,8 +5,10 @@
     using System.Linq.Expressions;
     using System.Threading.Tasks;
     using MongoDB.Driver;
+    using Utils;
+    using Utils.Query;
 
-    public interface IBaseRepositoryWithAccount<TDocument> where TDocument : IDocumentWithAccount
+    public interface IBaseRepositoryWithAccount<TDocument> where TDocument : class, IDocumentWithAccount, new()
     {
         IHelpersWithAccount<TDocument> Helpers { get; }
 
@@ -14,12 +16,9 @@
             string accountId,
             Expression<Func<TDocument, bool>> filterExpression);
 
-        Task<(int totalPages, IReadOnlyList<TDocument> readOnlyList)> QueryByPage(
+        Task<QueryResponse<TDocument>> QueryByPage(
             string accountId,
-            int page,
-            int pageSize,
-            FilterDefinition<TDocument> filterDefinition,
-            SortDefinition<TDocument> sortDefinition = null);
+            QueryRequest<TDocument> queryRequest);
 
         Task<IEnumerable<TProjected>> FilterBy<TProjected>(
             string accountId,

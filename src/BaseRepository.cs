@@ -8,8 +8,11 @@
     using Abstractions;
     using MongoDB.Bson;
     using MongoDB.Driver;
+    using Utils;
+    using Utils.Query;
 
-    public abstract class BaseRepository<TDocument> : IBaseRepository<TDocument> where TDocument : IDocument
+    public abstract class BaseRepository<TDocument> : IBaseRepository<TDocument>
+        where TDocument : class, IDocument, new()
     {
         protected readonly IMongoCollection<TDocument> Collection;
 
@@ -30,14 +33,9 @@
             return result.ToEnumerable();
         }
 
-        public async Task<(int totalPages, IReadOnlyList<TDocument> readOnlyList)> QueryByPage(
-            int page,
-            int pageSize,
-            FilterDefinition<TDocument> filterDefinition,
-            SortDefinition<TDocument> sortDefinition = null)
+        public async Task<QueryResponse<TDocument>> QueryByPage(
+            QueryRequest<TDocument> queryRequest)
         {
-            sortDefinition ??= Builders<TDocument>.Sort.Ascending(a => a.CreatedAt);
-
             var countFacet = AggregateFacet.Create("count",
                 PipelineDefinition<TDocument, AggregateCountResult>.Create(new[]
                 {
@@ -47,9 +45,9 @@
             var dataFacet = AggregateFacet.Create("data",
                 PipelineDefinition<TDocument, TDocument>.Create(new[]
                 {
-                    PipelineStageDefinitionBuilder.Sort(sortDefinition),
-                    PipelineStageDefinitionBuilder.Skip<TDocument>((page - 1) * pageSize),
-                    PipelineStageDefinitionBuilder.Limit<TDocument>(pageSize)
+                    PipelineStageDefinitionBuilder.Sort(queryRequest.SortDefinition),
+                    PipelineStageDefinitionBuilder.Skip<TDocument>((queryRequest.Page - 1) * queryRequest.PageSize),
+                    PipelineStageDefinitionBuilder.Limit<TDocument>(queryRequest.PageSize)
                 }));
 
             // turning case insentive for indexes (find and sort) .. indexes needs to be created at mongodb
@@ -59,37 +57,37 @@
             };
 
             var aggregation = await Collection.Aggregate(options)
-                .Match(filterDefinition)
+                .Match(queryRequest.FilterDefinition)
                 .Facet(countFacet, dataFacet)
                 .ToListAsync();
 
             var facetResults = aggregation.FirstOrDefault();
             if (facetResults is null)
-                return (0, new List<TDocument>());
+                return new QueryResponse<TDocument>(0, 0, 0, null);
 
             var countFacetResult = facetResults.Facets.FirstOrDefault(f => f.Name == "count");
             if (countFacetResult is null)
-                return (0, new List<TDocument>());
+                return new QueryResponse<TDocument>(0, 0, 0, null);
 
             var countResult = countFacetResult
                 .Output<AggregateCountResult>()
                 .FirstOrDefault();
 
             if (countResult is null)
-                return (0, new List<TDocument>());
+                return new QueryResponse<TDocument>(0, 0, 0, null);
 
             var count = countResult.Count;
 
-            var rest = count % pageSize;
-            var totalPages = (int) count / pageSize;
+            var rest = count % queryRequest.PageSize;
+            var totalPages = (int) count / queryRequest.PageSize;
             if (rest > 0) totalPages += 1;
 
             var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");
             if (dataFacetResults is null)
-                return (0, new List<TDocument>());
+                return new QueryResponse<TDocument>(0, 0, 0, null);
 
             var data = dataFacetResults.Output<TDocument>();
-            return (totalPages, data);
+            return new QueryResponse<TDocument>(queryRequest.Page, queryRequest.PageSize, totalPages, data);
         }
 
         public async Task<IEnumerable<TProjected>> FilterBy<TProjected>(
