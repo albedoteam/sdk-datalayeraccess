@@ -17,6 +17,6 @@
         public int PageSize { get; }
         public int TotalPages { get; }
         public IReadOnlyList<T> Records { get; }
-        public int RecordsInPage => Records.Count;
+        public int RecordsInPage => Records?.Count ?? 0;
     }
 }
