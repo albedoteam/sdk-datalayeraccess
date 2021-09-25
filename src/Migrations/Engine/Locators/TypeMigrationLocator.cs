@@ -15,7 +15,7 @@
                     where typeof(IDocumentMigration).IsAssignableFrom(type) && !type.IsAbstract
                     select type).Distinct();
 
-            Migrations = migrationTypes.Select(t => (IDocumentMigration) Activator.CreateInstance(t))
+            Migrations = migrationTypes.Select(t => (IDocumentMigration)Activator.CreateInstance(t))
                 .ToMigrationDictionary();
         }
     }

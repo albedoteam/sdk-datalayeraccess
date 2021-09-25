@@ -85,7 +85,7 @@
                             _migrationRunner.Run(type, document, collectionVersion);
 
                             var update = new ReplaceOneModel<BsonDocument>(
-                                new BsonDocument {{"_id", document["_id"]}},
+                                new BsonDocument { { "_id", document["_id"] } },
                                 document
                             );
 

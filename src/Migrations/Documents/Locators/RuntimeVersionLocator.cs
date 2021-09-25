@@ -24,7 +24,7 @@
                 from t in a.GetTypes()
                 let attributes = t.GetCustomAttributes(typeof(CollectionAttribute), true)
                 where attributes != null && attributes.Length > 0
-                select new {Type = t, Attributes = attributes.Cast<CollectionAttribute>()};
+                select new { Type = t, Attributes = attributes.Cast<CollectionAttribute>() };
 
             var versions = new Dictionary<Type, DocumentVersion>();
 
