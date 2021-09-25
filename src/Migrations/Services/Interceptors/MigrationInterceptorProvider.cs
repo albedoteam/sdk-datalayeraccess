@@ -24,7 +24,7 @@
 
         private static bool ShouldBeMigrated(Type type)
         {
-            return ((IList) type.GetInterfaces()).Contains(typeof(IDocument)) && type != typeof(BsonDocument);
+            return ((IList)type.GetInterfaces()).Contains(typeof(IDocument)) && type != typeof(BsonDocument);
         }
     }
 }

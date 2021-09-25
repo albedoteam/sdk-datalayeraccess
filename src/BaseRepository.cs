@@ -78,7 +78,7 @@
             var count = countResult.Count;
 
             var rest = count % queryRequest.PageSize;
-            var totalPages = (int) count / queryRequest.PageSize;
+            var totalPages = (int)count / queryRequest.PageSize;
             if (rest > 0) totalPages += 1;
 
             var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");
@@ -154,7 +154,7 @@
             var count = countResult.Count;
 
             var rest = count % pageSize;
-            var totalPages = (int) count / pageSize;
+            var totalPages = (int)count / pageSize;
             if (rest > 0) totalPages += 1;
 
             var dataFacetResults = facetResults.Facets.FirstOrDefault(x => x.Name == "data");

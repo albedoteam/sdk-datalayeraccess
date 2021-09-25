@@ -23,7 +23,7 @@
 
         private static string GetCollectionName(ICustomAttributeProvider documentType)
         {
-            return ((CollectionAttribute) documentType.GetCustomAttributes(
+            return ((CollectionAttribute)documentType.GetCustomAttributes(
                     typeof(CollectionAttribute), true)
                 .FirstOrDefault())?.Name;
         }

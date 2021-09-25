@@ -13,11 +13,14 @@
             parameters ??= new QueryParams
             {
                 Page = 1,
-                PageSize = 10
+                PageSize = 1
             };
 
             parameters.Page = parameters.Page > 0 ? parameters.Page : 1;
-            parameters.PageSize = parameters.PageSize <= 1 ? 10 : parameters.PageSize;
+
+            if (parameters.PageSize < 1)
+                parameters.PageSize = 1;
+            else if (parameters.PageSize > 100) parameters.PageSize = 100;
 
             var filtering = CreateFilters<T>(
                 parameters.ShowDeleted,
